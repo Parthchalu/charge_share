@@ -265,9 +265,6 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
     ? navClasses
     : `${navClasses} rounded-t-3xl`;
 
-  // Debug: Log navigation state
-  console.log('Navigation visibility:', { isNavVisible, hideNav, currentPageName, user });
-
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       <MessageToast
@@ -280,27 +277,28 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
         </main>
       </UserProvider>
 
-      {mobileNavItems.length > 0 && (
-        <nav className={finalNavClasses}>
-          {mobileNavItems.map((item) => {
-            const isActive = item.pageNames.includes(currentPageName);
-            return (
-              <Link
-                key={item.title}
-                to={item.url} className="text-slate-950 flex flex-col items-center justify-center w-full h-full transition-all duration-200 hover:text-gray-800 hover:bg-white/10 rounded-xl">
-
-                <div className="relative">
-                  <item.icon className="w-6 h-6" />
-                  {item.hasNotification &&
-                    <span className="absolute -top-1 -right-1.5 w-2 h-2 bg-blue-500 rounded-full"></span>
-                  }
-                </div>
-                <span className="text-xs mt-1">{item.title}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      )}
+      <nav className={finalNavClasses}>
+        {mobileNavItems.map((item) => {
+          const isActive = item.pageNames.includes(currentPageName);
+          return (
+            <Link
+              key={item.title}
+              to={item.url} 
+              className={`flex flex-col items-center justify-center w-full h-full transition-all duration-200 hover:bg-white/10 rounded-xl ${
+                isActive ? 'text-blue-600' : 'text-slate-950 hover:text-gray-800'
+              }`}
+            >
+              <div className="relative">
+                <item.icon className="w-6 h-6" />
+                {item.hasNotification && (
+                  <span className="absolute -top-1 -right-1.5 w-2 h-2 bg-blue-500 rounded-full"></span>
+                )}
+              </div>
+              <span className="text-xs mt-1">{item.title}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }
