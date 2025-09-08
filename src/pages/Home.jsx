@@ -100,7 +100,7 @@ export default function HomePage() {
         },
         { 
           enableHighAccuracy: true, 
-          timeout: 30000, // Increased timeout to 30 seconds
+          timeout: 60000, // Increased timeout to 60 seconds
           maximumAge: 0  // Don't use cached location
         }
       );
