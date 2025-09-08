@@ -90,6 +90,17 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
         
       } catch (error) {
         console.warn("User not logged in or session expired.", error);
+        
+        // Check if it's a 403 Forbidden error and initiate login
+        if (error.response?.status === 403 || error.status === 403) {
+          try {
+            await User.login();
+            return; // Exit early as login will handle the redirect
+          } catch (loginError) {
+            console.error("Login failed:", loginError);
+          }
+        }
+        
         setUser(null); // Set user to null if not logged in
         // For public pages, we don't need to do anything.
         // For protected pages, this could be where a redirect to a login page would happen
