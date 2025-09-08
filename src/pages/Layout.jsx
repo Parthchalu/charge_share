@@ -25,7 +25,7 @@ import {
 import { User, Message } from "@/api/entities";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import MessageToast from "./components/notifications/MessageToast";
+import MessageToast from "@/components/notifications/MessageToast";
 
 // Pages where users can function even with incomplete profiles
 const allowedPagesWithIncompleteProfile = [
