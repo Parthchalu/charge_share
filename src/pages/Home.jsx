@@ -351,3 +351,6 @@ export default function HomePage() {
 
       <div className={`fixed bottom-0 left-0 right-0 z-[9999] transition-all duration-300 ${isNavVisible ? 'translate-y-0' : 'translate-y-full'}`}>
       </div>
+    </div>
+  );
+}
