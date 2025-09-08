@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Search } from "lucide-react";
 import { AnimatePresence, motion } from 'framer-motion';
+import { useUser } from "@/contexts/UserContext";
 
 import InteractiveMapView from "../components/home/InteractiveMapView";
 import SearchPanel from "../components/home/SearchPanel";
@@ -21,7 +22,6 @@ export default function HomePage() {
   const [requestingLocation, setRequestingLocation] = useState(false);
   const [authError, setAuthError] = useState(false);
   const [selectedChargerId, setSelectedChargerId] = useState(null);
-  const [user, setUser] = useState(null);
   const [isPanelVisible, setIsPanelVisible] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true); // Fixed: Changed from `true` to `useState(true)`
   const [mapRecenterTrigger, setMapRecenterTrigger] = useState(0);
@@ -30,6 +30,7 @@ export default function HomePage() {
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
   const [step, setStep] = useState('search'); // 'search', 'routeSelect', 'chargerList'
 
+  const user = useUser(); // Get user from context instead of state
   const ignoreMapInteractionRef = useRef(true);
   const intentionalPanelShowRef = useRef(false); // New ref to track intentional panel shows
 
@@ -124,23 +125,16 @@ export default function HomePage() {
         ignoreMapInteractionRef.current = false;
       }, 500); // Ignore for 0.5 seconds
 
-      try {
-        const currentUser = await User.me();
-        if (currentUser && currentUser.id) {
-          setUser(currentUser);
-        } else {
-          setAuthError(true);
-        }
-      } catch (error) {
-        console.log("User not authenticated, redirecting to login");
+      // Check if user is available from context
+      if (!user) {
         setAuthError(true);
       }
+      
       setLoading(false); // Set overall loading to false after auth check
       await loadChargers(chargerParam); // Load chargers after auth status is known
       requestLocationPermission(); // Request location after auth status is known
     };
     initPageData();
-  }, [loadChargers, requestLocationPermission]);
   
   const retryLocation = () => {
     requestLocationPermission();

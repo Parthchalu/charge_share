@@ -26,6 +26,7 @@ import { User, Message } from "@/api/entities";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MessageToast from "@/components/notifications/MessageToast";
+import { UserProvider } from "@/contexts/UserContext";
 
 // Pages where users can function even with incomplete profiles
 const allowedPagesWithIncompleteProfile = [
@@ -261,9 +262,11 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
         message={newNotification}
         onDismiss={() => setNewNotification(null)} />
 
-      <main ref={mainContentRef} className="bg-gray-50 flex-grow overflow-y-auto">
-        {children}
-      </main>
+      <UserProvider user={user}>
+        <main ref={mainContentRef} className="bg-gray-50 flex-grow overflow-y-auto">
+          {children}
+        </main>
+      </UserProvider>
 
       <nav className={finalNavClasses}>
         {mobileNavItems.map((item) => {
