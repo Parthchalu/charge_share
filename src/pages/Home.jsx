@@ -56,7 +56,7 @@ export default function HomePage() {
       setChargers(data);
     } catch (error) {
       console.error("Failed to load chargers:", error);
-      if (error.response?.status === 403) {
+      if (error.response?.status === 403 || error.response?.status === 401) {
         setAuthError(true);
       }
     } finally {
@@ -126,14 +126,17 @@ export default function HomePage() {
     const checkAuthAndLoadData = async () => {
       try {
         const currentUser = await User.me();
-        setUser(currentUser);
-        loadChargers(chargerParam);
+        if (currentUser && currentUser.id) {
+          setUser(currentUser);
+          loadChargers(chargerParam);
+        } else {
+          setAuthError(true);
+        }
         loadChargers(chargerParam);
       } catch (error) {
         console.log("User not authenticated, redirecting to login");
         setAuthError(true);
       } finally {
-        setLoading(false);
       }
     };
 
