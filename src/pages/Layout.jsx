@@ -102,7 +102,7 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
         console.warn("User not logged in or session expired.", error);
 
         // Check if it's a 403 Forbidden error and initiate login
-        if (error.response?.status === 403 || error.status === 403) {
+        if (error.response?.status === 401 || error.status === 401 || error.response?.status === 403 || error.status === 403) {
           // Only initiate login for pages that require authentication
           if (!allowedPagesWithIncompleteProfile.includes(currentPageName)) {
             try {
