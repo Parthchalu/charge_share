@@ -127,10 +127,6 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
         if (!loginAttemptInProgress.current) {
           setLoading(false);
         }
-        // Only reset loginAttemptInProgress if it was set by this function and login didn't redirect
-        if (!error || (error.response?.status !== 403 && error.status !== 403)) {
-          loginAttemptInProgress.current = false;
-        }
       }
     };
     checkUser();
