@@ -132,11 +132,11 @@ export default function HomePage() {
         } else {
           setAuthError(true);
         }
-        loadChargers(chargerParam);
       } catch (error) {
         console.log("User not authenticated, redirecting to login");
         setAuthError(true);
       } finally {
+        setLoading(false);
       }
     };
 
