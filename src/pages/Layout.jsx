@@ -102,17 +102,18 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
 
         // Check if it's a 403 Forbidden error and initiate login
         if (error.response?.status === 403 || error.status === 403) {
-          try {
-            loginAttemptInProgress.current = true; // Set flag before initiating login
-            loginAttemptInProgress.current = true; // Set flag before initiating login
-            await User.login();
-            return; // Exit early as login will handle the redirect
-          } catch (loginError) {
-            console.error("Login failed:", loginError);
-          } finally {
-            loginAttemptInProgress.current = false; // Reset flag on login failure
-            loginAttemptInProgress.current = false; // Reset flag on login failure
-            setLoading(false); // Ensure loading state is cleared
+          // Only initiate login for pages that require authentication
+          if (!allowedPagesWithIncompleteProfile.includes(currentPageName)) {
+            try {
+              loginAttemptInProgress.current = true; // Set flag before initiating login
+              await User.login();
+              return; // Exit early as login will handle the redirect
+            } catch (loginError) {
+              console.error("Login failed:", loginError);
+            } finally {
+              loginAttemptInProgress.current = false; // Reset flag on login failure
+              setLoading(false); // Ensure loading state is cleared
+            }
           }
         }
 

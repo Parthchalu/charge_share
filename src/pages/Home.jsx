@@ -131,6 +131,8 @@ export default function HomePage() {
       } catch (error) {
         console.log("User not authenticated, redirecting to login");
         setAuthError(true);
+      } finally {
+        loadChargers(chargerParam);
         setLoading(false);
       }
     };
@@ -222,20 +224,6 @@ export default function HomePage() {
     requestLocationPermission();
   }, [requestLocationPermission]);
 
-  if (authError) {
-    return (
-      <div className="w-full h-full flex items-center justify-center">
-        <div className="text-center p-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Authentication Required</h2>
-          <p className="text-gray-600 mb-6">Please log in to view charging stations.</p>
-          <Button onClick={() => User.login()} className="bg-blue-600 hover:bg-blue-700">
-            Log In
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   if (loading && !chargers.length) {
     return (
       <div className="w-full h-full flex items-center justify-center">
@@ -282,6 +270,39 @@ export default function HomePage() {
                 </AlertDescription>
               </Alert>
             </motion.div>
+        )}
+      </AnimatePresence>
+      
+      <AnimatePresence>
+        {authError && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-lg p-8 m-4 max-w-sm w-full text-center shadow-xl"
+            >
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Sign In Required</h2>
+              <p className="text-gray-600 mb-6">Please log in to access all features and personalized content.</p>
+              <div className="space-y-3">
+                <Button onClick={() => User.login()} className="w-full bg-blue-600 hover:bg-blue-700">
+                  Log In
+                </Button>
+                <Button 
+                  onClick={() => setAuthError(false)} 
+                  variant="outline" 
+                  className="w-full"
+                >
+                  Continue as Guest
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
       
