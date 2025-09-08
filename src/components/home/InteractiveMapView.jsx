@@ -19,6 +19,7 @@ export default function InteractiveMapView({ chargers, userLocation, onChargerSe
   const compassPermissionRef = useRef(false);
   const [mapType, setMapType] = useState('roadmap');
   const directionsRendererRef = useRef(null);
+  const [isGoogleMapsScriptLoaded, setIsGoogleMapsScriptLoaded] = useState(false);
 
   const defaultCenter = useMemo(() =>
     userLocation || { lat: 19.0760, lng: 72.8777 },
@@ -157,8 +158,39 @@ export default function InteractiveMapView({ chargers, userLocation, onChargerSe
     requestCompassPermission();
   }, []);
 
+  // Load Google Maps script only once
+  useEffect(() => {
+    if (!window.google && !isGoogleMapsScriptLoaded) {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places,geometry&v=3.55`;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        setIsGoogleMapsScriptLoaded(true);
+      };
+      script.onerror = () => {
+        console.error('Failed to load Google Maps');
+        if (mapRef.current) {
+          mapRef.current.innerHTML = `
+            <div class="flex items-center justify-center h-full bg-gray-100 text-center p-8">
+              <div>
+                <div class="text-red-500 mb-4">⚠️</div>
+                <h3 class="font-semibold mb-2">Google Maps Failed to Load</h3>
+                <p class="text-gray-600 text-sm">Please check your internet connection and try again.</p>
+              </div>
+            </div>
+          `;
+        }
+      };
+      document.head.appendChild(script);
+    } else if (window.google) {
+      setIsGoogleMapsScriptLoaded(true);
+    }
+  }, []);
   // Initialize Google Maps
   useEffect(() => {
+    if (!isGoogleMapsScriptLoaded || !mapRef.current) return;
+
     const initMap = () => {
       // More robust check to ensure Maps API is fully loaded
       if (!window.google?.maps?.Map || !mapRef.current) return;
@@ -245,36 +277,9 @@ export default function InteractiveMapView({ chargers, userLocation, onChargerSe
       setMap(googleMap);
     };
 
-    if (!window.google) {
-      const script = document.createElement('script');
-      // Removed invalid `loading=async` parameter
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places,geometry&v=3.55`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        // Add small delay to ensure DOM is ready
-        setTimeout(initMap, 50);
-      };
-      script.onerror = () => {
-        console.error('Failed to load Google Maps');
-        if (mapRef.current) {
-          mapRef.current.innerHTML = `
-            <div class="flex items-center justify-center h-full bg-gray-100 text-center p-8">
-              <div>
-                <div class="text-red-500 mb-4">⚠️</div>
-                <h3 class="font-semibold mb-2">Google Maps Failed to Load</h3>
-                <p class="text-gray-600 text-sm">Please check your internet connection and try again.</p>
-              </div>
-            </div>
-          `;
-        }
-      };
-      document.head.appendChild(script);
-    } else {
-      // Add small delay even if already loaded
-      setTimeout(initMap, 50);
-    }
-  }, [map, defaultCenter, zoom, onMapInteract]);
+    // Add small delay to ensure DOM is ready
+    setTimeout(initMap, 50);
+  }, [isGoogleMapsScriptLoaded, mapRef.current, map, defaultCenter, zoom, onMapInteract]);
 
   // Handle drawing routes
   useEffect(() => {
