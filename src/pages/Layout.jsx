@@ -23,6 +23,7 @@ import {
   SheetTrigger
 } from "@/components/ui/sheet";
 import { User, Message } from "@/api/entities";
+import { getAccessToken } from "@base44/sdk";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import MessageToast from "@/components/notifications/MessageToast";
@@ -77,6 +78,15 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
 
       if (loginAttemptInProgress.current) {
         return; // Prevent re-entry if login is already in progress
+      }
+
+      // Check if user has an access token before attempting User.me()
+      const accessToken = getAccessToken();
+      if (!accessToken) {
+        console.log("No access token found, user not logged in");
+        setUser(null);
+        setLoading(false);
+        return;
       }
 
       try {
