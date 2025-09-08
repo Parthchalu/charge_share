@@ -63,6 +63,7 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
   const isInitialFetch = React.useRef(true);
   const lastScrollY = React.useRef(0);
   const loginAttemptInProgress = React.useRef(false);
+  const loginAttemptInProgress = React.useRef(false);
   const mainContentRef = React.useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -70,6 +71,10 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
   // Effect 1: User authentication and profile completion check
   React.useEffect(() => {
     const checkUser = async () => {
+      if (loginAttemptInProgress.current) {
+        return; // Prevent re-entry if login is already in progress
+      }
+
       if (loginAttemptInProgress.current) {
         return; // Prevent re-entry if login is already in progress
       }
@@ -100,10 +105,13 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
         if (error.response?.status === 403 || error.status === 403) {
           try {
             loginAttemptInProgress.current = true; // Set flag before initiating login
+            loginAttemptInProgress.current = true; // Set flag before initiating login
             await User.login();
             return; // Exit early as login will handle the redirect
           } catch (loginError) {
             console.error("Login failed:", loginError);
+          } finally {
+            loginAttemptInProgress.current = false; // Reset flag on login failure
             loginAttemptInProgress.current = false; // Reset flag on login failure
             setLoading(false); // Ensure loading state is cleared
           }
@@ -115,7 +123,10 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
         // For protected pages, this could be where a redirect to a login page would happen
         // if the app wasn't handling it automatically.
       } finally {
-        setLoading(false); // Always set loading to false after attempt
+        // Only set loading to false if no login attempt is in progress
+        if (!loginAttemptInProgress.current) {
+          setLoading(false);
+        }
         // Only reset loginAttemptInProgress if it was set by this function and login didn't redirect
         if (!error || (error.response?.status !== 403 && error.status !== 403)) {
           loginAttemptInProgress.current = false;
