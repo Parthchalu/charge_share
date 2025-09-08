@@ -63,7 +63,6 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
   const isInitialFetch = React.useRef(true);
   const lastScrollY = React.useRef(0);
   const loginAttemptInProgress = React.useRef(false);
-  const loginAttemptInProgress = React.useRef(false);
   const mainContentRef = React.useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
