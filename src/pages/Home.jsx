@@ -138,6 +138,7 @@ export default function HomePage() {
       setLoading(false); // Set overall loading to false after auth check
       await loadChargers(chargerParam); // Load chargers after auth status is known
       requestLocationPermission(); // Request location after auth status is known
+    };
     initPageData();
   }, [loadChargers, requestLocationPermission]);
   
@@ -211,11 +212,11 @@ export default function HomePage() {
     setTimeout(() => {
       intentionalPanelShowRef.current = false;
     }, 1500); // 1.5 second delay
-  }
+  };
 
   const handleBackToRouteSelect = () => {
     setStep('routeSelect');
-  }
+  };
 
   const refreshLocationAndCenter = useCallback(() => {
     // This function will now trigger a fresh location request.
