@@ -62,6 +62,7 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
   const notifiedMessageIdsRef = React.useRef(new Set());
   const isInitialFetch = React.useRef(true);
   const lastScrollY = React.useRef(0);
+  const loginAttemptInProgress = React.useRef(false);
   const mainContentRef = React.useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -69,6 +70,10 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
   // Effect 1: User authentication and profile completion check
   React.useEffect(() => {
     const checkUser = async () => {
+      if (loginAttemptInProgress.current) {
+        return; // Prevent re-entry if login is already in progress
+      }
+
       try {
         const currentUser = await User.me();
         setUser(currentUser); // Update user state
@@ -90,16 +95,20 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
         
       } catch (error) {
         console.warn("User not logged in or session expired.", error);
-        
+
         // Check if it's a 403 Forbidden error and initiate login
         if (error.response?.status === 403 || error.status === 403) {
           try {
+            loginAttemptInProgress.current = true; // Set flag before initiating login
             await User.login();
             return; // Exit early as login will handle the redirect
           } catch (loginError) {
             console.error("Login failed:", loginError);
+            loginAttemptInProgress.current = false; // Reset flag on login failure
+            setLoading(false); // Ensure loading state is cleared
           }
         }
+
         
         setUser(null); // Set user to null if not logged in
         // For public pages, we don't need to do anything.
@@ -107,6 +116,10 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
         // if the app wasn't handling it automatically.
       } finally {
         setLoading(false); // Always set loading to false after attempt
+        // Only reset loginAttemptInProgress if it was set by this function and login didn't redirect
+        if (!error || (error.response?.status !== 403 && error.status !== 403)) {
+          loginAttemptInProgress.current = false;
+        }
       }
     };
     checkUser();
