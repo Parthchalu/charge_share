@@ -111,40 +111,35 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    // Temporarily ignore map interactions on initial load to prevent panel from hiding
-    ignoreMapInteractionRef.current = true;
-    const timer = setTimeout(() => {
-      ignoreMapInteractionRef.current = false;
-    }, 500); // Ignore for 0.5 seconds
-
     const urlParams = new URLSearchParams(window.location.search);
     const chargerParam = urlParams.get('charger');
     if (chargerParam) {
       setSelectedChargerId(chargerParam);
     }
 
-    const checkAuthAndLoadData = async () => {
+    const initPageData = async () => {
+      // Temporarily ignore map interactions on initial load to prevent panel from hiding
+      ignoreMapInteractionRef.current = true;
+      const timer = setTimeout(() => {
+        ignoreMapInteractionRef.current = false;
+      }, 500); // Ignore for 0.5 seconds
+
       try {
         const currentUser = await User.me();
         if (currentUser && currentUser.id) {
           setUser(currentUser);
-          loadChargers(chargerParam);
         } else {
           setAuthError(true);
         }
       } catch (error) {
         console.log("User not authenticated, redirecting to login");
         setAuthError(true);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    checkAuthAndLoadData();
-    requestLocationPermission();
-
-    return () => clearTimeout(timer);
-  }, [loadChargers, requestLocationPermission]); // Updated dependency array
+      setLoading(false); // Set overall loading to false after auth check
+      await loadChargers(chargerParam); // Load chargers after auth status is known
+      requestLocationPermission(); // Request location after auth status is known
+    initPageData();
+  }, [loadChargers, requestLocationPermission]);
   
   const retryLocation = () => {
     requestLocationPermission();
