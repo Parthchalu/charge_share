@@ -248,7 +248,7 @@ export default function InteractiveMapView({ chargers, userLocation, onChargerSe
     if (!window.google) {
       const script = document.createElement('script');
       // Removed invalid `loading=async` parameter
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCOevTHZQAA8oewunLXHJeUzLALdd-AEqU&libraries=places,geometry&v=3.55`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places,geometry&v=3.55`;
       script.async = true;
       script.defer = true;
       script.onload = () => {

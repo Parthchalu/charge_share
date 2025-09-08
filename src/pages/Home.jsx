@@ -128,11 +128,11 @@ export default function HomePage() {
         const currentUser = await User.me();
         setUser(currentUser);
         loadChargers(chargerParam);
+        loadChargers(chargerParam);
       } catch (error) {
         console.log("User not authenticated, redirecting to login");
         setAuthError(true);
       } finally {
-        loadChargers(chargerParam);
         setLoading(false);
       }
     };
