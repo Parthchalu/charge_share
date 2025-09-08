@@ -58,7 +58,6 @@ export default function HomePage() {
       console.error("Failed to load chargers:", error);
       if (error.response?.status === 403) {
         setAuthError(true);
-        await User.login();
       }
     } finally {
       setLoading(false);
@@ -133,7 +132,6 @@ export default function HomePage() {
         console.log("User not authenticated, redirecting to login");
         setAuthError(true);
         setLoading(false);
-        await User.login();
       }
     };
 
