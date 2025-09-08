@@ -135,6 +135,7 @@ export default function HomePage() {
       requestLocationPermission(); // Request location after auth status is known
     };
     initPageData();
+  }, [user, loadChargers, requestLocationPermission]);
   
   const retryLocation = () => {
     requestLocationPermission();
