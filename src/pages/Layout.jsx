@@ -297,7 +297,8 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
         </button>
 
         {!isNavCollapsed && (
-        {mobileNavItems.map((item) => {
+          <>
+            {mobileNavItems.map((item) => {
           const isActive = item.pageNames.includes(currentPageName);
           return (
             <Link
@@ -316,7 +317,8 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
               <span className="text-xs mt-1">{item.title}</span>
             </Link>
           );
-        })}
+            })}
+          </>
         )}
         
         {/* Collapsed state - show only toggle */}
