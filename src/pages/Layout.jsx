@@ -16,6 +16,8 @@ import {
   Search,
   MessageSquare,
   Smile
+  ChevronUp,
+  ChevronDown
 } from "lucide-react";
 import {
   Sheet,
@@ -61,6 +63,7 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
   const [hasUnreadMessages, setHasUnreadMessages] = React.useState(false);
   const [isNavVisible, setIsNavVisible] = React.useState(true);
   const [newNotification, setNewNotification] = React.useState(null);
+  const [isNavCollapsed, setIsNavCollapsed] = React.useState(false);
   const notifiedMessageIdsRef = React.useRef(new Set());
   const isInitialFetch = React.useRef(true);
   const lastScrollY = React.useRef(0);
@@ -265,6 +268,9 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
     ? navClasses
     : `${navClasses} rounded-t-3xl`;
 
+  const toggleNavCollapse = () => {
+    setIsNavCollapsed(!isNavCollapsed);
+  };
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       <MessageToast
@@ -277,7 +283,20 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
         </main>
       </UserProvider>
 
-      <nav className={finalNavClasses}>
+      <nav className={`${finalNavClasses} ${isNavCollapsed ? 'h-12' : 'h-16'}`}>
+        {/* Toggle Button */}
+        <button
+          onClick={toggleNavCollapse}
+          className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-t-lg px-3 py-1 shadow-sm hover:bg-white/90 transition-all"
+        >
+          {isNavCollapsed ? (
+            <ChevronUp className="w-4 h-4 text-gray-600" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-gray-600" />
+          )}
+        </button>
+
+        {!isNavCollapsed && (
         {mobileNavItems.map((item) => {
           const isActive = item.pageNames.includes(currentPageName);
           return (
@@ -298,6 +317,14 @@ export default function Layout({ children, currentPageName, hideNav = false }) {
             </Link>
           );
         })}
+        )}
+        
+        {/* Collapsed state - show only toggle */}
+        {isNavCollapsed && (
+          <div className="flex items-center justify-center w-full h-full">
+            <div className="w-8 h-1 bg-gray-400 rounded-full"></div>
+          </div>
+        )}
       </nav>
     </div>
   );
