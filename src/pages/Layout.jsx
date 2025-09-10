@@ -15,7 +15,7 @@ import {
   List,
   Search,
   MessageSquare,
-  Smile
+  Smile,
   ChevronUp,
   ChevronDown
 } from "lucide-react";
